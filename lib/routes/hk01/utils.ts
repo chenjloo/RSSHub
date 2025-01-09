@@ -16,10 +16,11 @@ const ProcessItems = (items, limit, tryGet) =>
             .slice(0, limit ? Number.parseInt(limit) : 50)
             .map((item) => ({
                 title: item.data.title,
-                link: `${rootUrl}/sns/article/${item.data.articleId}`,
+                link: item.data.publishUrl,
                 pubDate: parseDate(item.data.publishTime * 1000),
                 category: item.data.tags.map((t) => t.tagName),
                 author: item.data.authors.map((a) => a.publishName).join(', '),
+                articleImg: item.data.mainImage.cdnUrl,
             }))
             .map((item) =>
                 tryGet(item.link, async () => {
@@ -28,13 +29,18 @@ const ProcessItems = (items, limit, tryGet) =>
                         url: item.link,
                     });
 
-                    const content = JSON.parse(detailResponse.data.match(/"__NEXT_DATA__" type="application\/json">({"props":.*})<\/script>/)[1]);
+                    const content = load(article.data);
 
-                    item.description = art(path.join(__dirname, 'templates/description.art'), {
-                        image: content.props.initialProps.pageProps.article.originalImage.cdnUrl,
-                        teasers: content.props.initialProps.pageProps.article.teaser,
-                        blocks: content.props.initialProps.pageProps.article.blocks,
-                    });
+                    // remove unwanted elements
+                    content('#ad_popup').remove();
+                    content('[class^=ad-]').remove();
+                    content('[id^=ad-]').remove();
+                    content('[id^=div-gpt-ad-]').remove();
+                    content('.view-tracker').remove();
+                    content('.w-screen').remove();
+                    content('.grid').remove();
+
+                    item.description = renderDesc(item.articleImg, content('#article-content-section').html());
 
                     return item;
                 })
