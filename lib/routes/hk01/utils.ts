@@ -29,7 +29,7 @@ const ProcessItems = (items, limit, tryGet) =>
                         url: item.link,
                     });
 
-                    const content = load(article.data);
+                    const content = load(detailResponse.data);
 
                     // remove unwanted elements
                     content('#ad_popup').remove();
