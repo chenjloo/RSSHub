@@ -41,12 +41,10 @@ const ProcessItems = (items, limit, tryGet) =>
                     //content('.grid').remove();
 
                     item.description = art(path.join(__dirname, 'templates/description.art'), {
-                        item.articleImg,
-                        content('div#article-content')
-                                           .find('p')
-                                           .map((_, el) => content(el).html()) 
-                                           .get(); 
+                        articleImg: item.articleImg,
+                        content: content('div#article-content').find('p').map((_, el) => content(el).html()).get(); 
                     });
+
 
                     return item;
                 })
