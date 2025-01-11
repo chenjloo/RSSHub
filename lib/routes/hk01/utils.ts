@@ -44,7 +44,7 @@ const ProcessItems = (items, limit, tryGet) =>
                         item.articleImg,
                         content('div#article-content')
                                            .find('p')
-                                           .map((_, el) => $(el).text()) 
+                                           .map((_, el) => content(el).html()) 
                                            .get(); 
                     });
 
