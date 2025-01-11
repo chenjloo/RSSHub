@@ -40,7 +40,6 @@ const ProcessItems = (items, limit, tryGet) =>
                     content('.w-screen').remove();
                     content('.grid').remove();
 
-                    item.description = renderDesc(item.articleImg, content('#article-content-section').html());
                     item.description = art(path.join(__dirname, 'templates/description.art'), {
                         articleImg,
                         content('div#article-content').html(),
