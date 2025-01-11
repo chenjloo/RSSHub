@@ -32,17 +32,20 @@ const ProcessItems = (items, limit, tryGet) =>
                     const content = cheerio.load(detailResponse.data);
 
                     // remove unwanted elements
-                    content('#ad_popup').remove();
-                    content('[class^=ad-]').remove();
-                    content('[id^=ad-]').remove();
-                    content('[id^=div-gpt-ad-]').remove();
-                    content('.view-tracker').remove();
-                    content('.w-screen').remove();
-                    content('.grid').remove();
+                    //content('#ad_popup').remove();
+                    //content('[class^=ad-]').remove();
+                    //content('[id^=ad-]').remove();
+                    //content('[id^=div-gpt-ad-]').remove();
+                    //content('.view-tracker').remove();
+                    //content('.w-screen').remove();
+                    //content('.grid').remove();
 
                     item.description = art(path.join(__dirname, 'templates/description.art'), {
                         item.articleImg,
-                        content('div#article-content').html(),
+                        content('div#article-content')
+                                           .find('p')
+                                           .map((_, el) => $(el).text()) 
+                                           .get(); 
                     });
 
                     return item;
