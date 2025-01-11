@@ -28,10 +28,6 @@ const ProcessItems = (items, limit, tryGet) =>
                     const detailResponse = await got({
                         method: 'get',
                         url: item.link,
-                        headers: {
-                            Referer: rootUrl,
-                        },
-                        cookieJar,
                     });
 
                     const content = load(detailResponse.data);
@@ -52,7 +48,7 @@ const ProcessItems = (items, limit, tryGet) =>
 
                     item.description = art(path.join(__dirname, 'templates/description.art'), {
                         image: item.articleImg,
-                        blocks:articleContent,
+                        blocks: articleContent,
                     });
 
 
