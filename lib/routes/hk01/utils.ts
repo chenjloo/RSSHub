@@ -28,6 +28,10 @@ const ProcessItems = (items, limit, tryGet) =>
                     const detailResponse = await got({
                         method: 'get',
                         url: item.link,
+                        headers: {
+                            Referer: rootUrl,
+                        },
+                        cookieJar,
                     });
 
                     const content = load(detailResponse.data);
