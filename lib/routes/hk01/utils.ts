@@ -42,7 +42,7 @@ const ProcessItems = (items, limit, tryGet) =>
 
                     item.description = art(path.join(__dirname, 'templates/description.art'), {
                         articleImg: item.articleImg,
-                        content: content('div#article-content').find('p').map((_, el) => content(el).html()).get(); 
+                        content: content('div#article-content').find('p').map((_, el) => content(el).html()).get(),
                     });
 
 
