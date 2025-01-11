@@ -29,7 +29,7 @@ const ProcessItems = (items, limit, tryGet) =>
                         url: item.link,
                     });
 
-                    const content = load(detailResponse.data);
+                    const content = cheerio.load(detailResponse.data);
 
                     // remove unwanted elements
                     content('#ad_popup').remove();
