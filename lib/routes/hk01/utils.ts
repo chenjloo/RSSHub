@@ -41,7 +41,7 @@ const ProcessItems = (items, limit, tryGet) =>
                     content('.grid').remove();
 
                     item.description = art(path.join(__dirname, 'templates/description.art'), {
-                        articleImg,
+                        item.articleImg,
                         content('div#article-content').html(),
                     });
 
