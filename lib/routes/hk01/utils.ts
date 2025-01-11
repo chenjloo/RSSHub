@@ -41,9 +41,14 @@ const ProcessItems = (items, limit, tryGet) =>
                     //content('.w-screen').remove();
                     //content('.grid').remove();
 
+                    const articleContent = content('#article-content-section')
+                        .find('p')
+                        .map((_, el) => content(el).html())
+                        .get(); 
+
                     item.description = art(path.join(__dirname, 'templates/description.art'), {
-                        articleImg: item.articleImg,
-                        content: content('#article-content-section').find('p').map((_, el) => content(el).html()).get(),
+                        image: item.articleImg,
+                        blocks:articleContent,
                     });
 
 
