@@ -38,11 +38,11 @@ const ProcessItems = (items, limit, tryGet) =>
                     //content('[id^=ad-]').remove();
                     //content('[id^=div-gpt-ad-]').remove();
                     //content('.view-tracker').remove();
-                    content('.w-screen').remove();
-                    content('.grid').remove();
-                    content('div').remove();
-
-                    const articleContent = content('#article-content-section').html();
+                    const articleContent = content('#article-content-section')
+                        .find('div')
+                        .remove()
+                        .end()
+                        .html();
 
                     const articleImg = art(path.join(__dirname, 'templates/description.art'), {
                         image: item.articleImg,
