@@ -38,18 +38,17 @@ const ProcessItems = (items, limit, tryGet) =>
                     //content('[id^=ad-]').remove();
                     //content('[id^=div-gpt-ad-]').remove();
                     //content('.view-tracker').remove();
-                    //content('.w-screen').remove();
-                    //content('.grid').remove();
+                    content('.w-screen').remove();
+                    content('.grid').remove();
+                    content('div').remove();
 
-                    const articleContent = content('#article-content-section')
-                        .find('p')
-                        .map((_, el) => content(el).html())
-                        .get(); 
+                    const articleContent = content('#article-content-section').html();
 
-                    item.description = art(path.join(__dirname, 'templates/description.art'), {
+                    const articleImg = art(path.join(__dirname, 'templates/description.art'), {
                         image: item.articleImg,
-                        blocks: articleContent,
                     });
+
+                    item.description = articleImg + articleContent;
 
 
                     return item;
