@@ -32,12 +32,6 @@ const ProcessItems = (items, limit, tryGet) =>
 
                     const content = load(detailResponse.data);
 
-                    // remove unwanted elements
-                    //content('#ad_popup').remove();
-                    //content('[class^=ad-]').remove();
-                    //content('[id^=ad-]').remove();
-                    //content('[id^=div-gpt-ad-]').remove();
-                    //content('.view-tracker').remove();
                     const articleContent = content('#article-content-section')
                         .find('div')
                         .remove()
@@ -49,7 +43,6 @@ const ProcessItems = (items, limit, tryGet) =>
                     });
 
                     item.description = articleImg + articleContent;
-
 
                     return item;
                 })
