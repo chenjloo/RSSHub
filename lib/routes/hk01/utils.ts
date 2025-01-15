@@ -33,11 +33,6 @@ const ProcessItems = (items, limit, tryGet) =>
                     const content = load(detailResponse.data);
 
                     const articleContent = content('#article-content-section')
-                        .find('div')
-                        .remove()
-                        .end()
-                        .html();
-                    const articleContent = content('#article-content-section')
                         .children('div')
                         .remove()
                         .end()
