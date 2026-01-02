@@ -30,6 +30,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: 
+          tags:
             - chenjloo/rsshub:test
             # - chenjloo/rsshub:${{ github.sha }}
