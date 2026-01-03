@@ -3,7 +3,7 @@ name: Build and Push RSSHub Docker
 on:
   push:
     branches:
-      - test
+      - archive-26v
   workflow_dispatch:
 
 jobs:
@@ -31,5 +31,5 @@ jobs:
           context: .
           push: true
           tags: |
-            chenjloo/rsshub:test
+            chenjloo/rsshub:archive-26v
           # chenjloo/rsshub:${{ github.sha }}
