@@ -7,13 +7,10 @@ import { load } from 'cheerio';
 const rootUrl = 'https://hk01.com';
 const apiRootUrl = 'https://web-data.api.hk01.com';
 
-const renderDescription = ({ image }) =>
-    image
-        ? renderToString(
-              <img src={image} referrerPolicy="no-referrer" loading="lazy"
-              />
-          )
-        : '';
+const renderDescription = ({ image }) => {
+    if (!image) return '';
+    return renderToString(<img src={image} />);
+};
 
 const ProcessItems = (items, limit, tryGet) =>
     Promise.all(
