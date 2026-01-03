@@ -1,8 +1,11 @@
 import { renderToString } from 'hono/jsx/dom/server';
+const __dirname = getCurrentPath(import.meta.url);
 
 import got from '@/utils/got';
 import { load } from 'cheerio';
 import { parseDate } from '@/utils/parse-date';
+import { art } from '@/utils/render';
+import path from 'node:path';
 
 const rootUrl = 'https://hk01.com';
 const apiRootUrl = 'https://web-data.api.hk01.com';
