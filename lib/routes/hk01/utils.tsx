@@ -9,7 +9,7 @@ const apiRootUrl = 'https://web-data.api.hk01.com';
 
 const renderDescription = ({ image }) => {
     if (!image) return '';
-    return renderToString(<><img src={image} /><br /></>);
+    return renderToString(<><img src={image} />&nbsp</>);
 };
 
 const ProcessItems = (items, limit, tryGet) =>
