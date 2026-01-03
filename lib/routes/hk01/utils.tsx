@@ -112,8 +112,12 @@ const ProcessItems = (items, limit, tryGet) =>
                     });
 
                     const content = load(detailResponse.data);
+                    const articleContent = content('#article-content-section')
+                           .children('div').remove().end()
+                           .find('div.cmp-icon').remove().end()
+                           .html();
 
-                    item.description = content;
+                    item.description = articleContent;
 
                     return item;
                 })
