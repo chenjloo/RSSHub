@@ -103,6 +103,7 @@ const ProcessItems = (items, limit, tryGet) =>
                 pubDate: parseDate(item.data.publishTime * 1000),
                 category: item.data.tags.map((t) => t.tagName),
                 author: item.data.authors.map((a) => a.publishName).join(', '),
+                articleImg: item.data.mainImage.cdnUrl,
             }))
             .map((item) =>
                 tryGet(item.link, async () => {
@@ -117,7 +118,7 @@ const ProcessItems = (items, limit, tryGet) =>
                            .find('div.cmp-icon').remove().end()
                            .html();
 
-                    item.description = articleContent;
+                    item.description = articleImg;
 
                     return item;
                 })
