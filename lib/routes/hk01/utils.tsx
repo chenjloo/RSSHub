@@ -32,7 +32,6 @@ const ProcessItems = (items, limit, tryGet) =>
                                                .find('div.cmp-icon').remove().end()
                                                .html();
 
-
                     item.description = articleContent;
                     
                     return item;
