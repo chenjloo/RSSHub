@@ -117,6 +117,10 @@ const ProcessItems = (items, limit, tryGet) =>
                            .children('div').remove().end()
                            .find('div.cmp-icon').remove().end()
                            .html();
+                    
+                    const articleImg = art(path.join(__dirname, 'templates/description.art'), {
+                        image: item.articleImg,
+                    });
 
                     item.description = articleImg;
 
