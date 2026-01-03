@@ -1,6 +1,7 @@
 import { renderToString } from 'hono/jsx/dom/server';
 
 import got from '@/utils/got';
+import { load } from 'cheerio';
 import { parseDate } from '@/utils/parse-date';
 
 const rootUrl = 'https://hk01.com';
@@ -110,7 +111,7 @@ const ProcessItems = (items, limit, tryGet) =>
                         url: item.link,
                     });
 
-                    const content = JSON.parse(detailResponse.data.match(/"__NEXT_DATA__" type="application\/json">({"props":.*})<\/script>/)[1]);
+                    const content = load(detailResponse.data);
 
                     item.description = content;
 
