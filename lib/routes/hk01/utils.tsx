@@ -99,7 +99,7 @@ const ProcessItems = (items, limit, tryGet) =>
             .slice(0, limit ? Number.parseInt(limit) : 50)
             .map((item) => ({
                 title: item.data.title,
-                link: `${rootUrl}/sns/article/${item.data.articleId}`,
+                link: item.data.publishUrl,
                 pubDate: parseDate(item.data.publishTime * 1000),
                 category: item.data.tags.map((t) => t.tagName),
                 author: item.data.authors.map((a) => a.publishName).join(', '),
