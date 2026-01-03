@@ -3,7 +3,7 @@ name: Build and Push RSSHub Docker Image
 on:
   push:
     branches:
-      - arhive-23
+      - arhive-23v
   workflow_dispatch:
 
 jobs:
@@ -31,6 +31,6 @@ jobs:
           context: .
           push: true
           tags: |
-            chenjloo/rsshub:test
+            chenjloo/rsshub:arhive-23v
 
           # chenjloo/rsshub:${{ github.sha }}
