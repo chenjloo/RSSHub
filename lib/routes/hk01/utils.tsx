@@ -121,7 +121,9 @@ const ProcessItems = (items, limit, tryGet) =>
                            .find('div.cmp-icon').remove().end()
                            .html();
                     
-                    item.description = renderDescription({image: articleImg}) + articleContent;
+                    const articleImg = `<img src="${item.imageUrl}" referrerpolicy="no-referrer" loading="lazy">`;
+
+                    item.description = articleImg + articleContent;
 
                     return item;
                 })
