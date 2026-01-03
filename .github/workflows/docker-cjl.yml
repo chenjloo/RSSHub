@@ -3,7 +3,7 @@ name: Build and Push RSSHub Docker Image
 on:
   push:
     branches:
-      - arhive-23v
+      - arhive-23
   workflow_dispatch:
 
 jobs:
