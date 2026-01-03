@@ -1,4 +1,4 @@
-name: Docker Release for chenjloo
+name: Docker Release
 
 on:
   push:
@@ -32,5 +32,5 @@ jobs:
           push: true
           tags: |
             chenjloo/rsshub:archive-23v
-
+            
           # chenjloo/rsshub:${{ github.sha }}
