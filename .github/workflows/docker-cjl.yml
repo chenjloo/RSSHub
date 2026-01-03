@@ -3,7 +3,7 @@ name: Docker Release
 on:
   push:
     branches:
-      - arhive-23v
+      - archive-23v
   workflow_dispatch:
 
 jobs:
@@ -31,6 +31,6 @@ jobs:
           context: .
           push: true
           tags: |
-            chenjloo/rsshub:arhive-23v
+            chenjloo/rsshub:archive-23v
 
           # chenjloo/rsshub:${{ github.sha }}
