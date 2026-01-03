@@ -1,9 +1,9 @@
-name: Docker Release for chenjloo
+name: Build and Push RSSHub Docker
 
 on:
   push:
     branches:
-      - archive-23v
+      - archive-25v
   workflow_dispatch:
 
 jobs:
@@ -31,5 +31,5 @@ jobs:
           context: .
           push: true
           tags: |
-            chenjloo/rsshub:archive-23v
+            chenjloo/rsshub:archive-25v
           # chenjloo/rsshub:${{ github.sha }}
