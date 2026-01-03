@@ -1,11 +1,8 @@
 import { renderToString } from 'hono/jsx/dom/server';
-const __dirname = getCurrentPath(import.meta.url);
 
 import got from '@/utils/got';
-import { load } from 'cheerio';
 import { parseDate } from '@/utils/parse-date';
-import { art } from '@/utils/render';
-import path from 'node:path';
+import { load } from 'cheerio';
 
 const rootUrl = 'https://hk01.com';
 const apiRootUrl = 'https://web-data.api.hk01.com';
@@ -116,13 +113,14 @@ const ProcessItems = (items, limit, tryGet) =>
                     });
 
                     const content = load(detailResponse.data);
+
                     const articleContent = content('#article-content-section')
-                           .children('div').remove().end()
-                           .find('div.cmp-icon').remove().end()
-                           .html();
-                    
+                                               .children('div').remove().end()
+                                               .find('div.cmp-icon').remove().end()
+                                               .html();
+
                     const articleImg = renderDescription({
-                            image: item.articleImg,
+                        image: item.articleImg,
                     });
 
                     item.description = articleImg + articleContent;
