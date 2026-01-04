@@ -7,6 +7,7 @@ on:
 
 jobs:
   sync:
+    if: github.ref == 'refs/heads/master'  # ← 只有 master 才执行
     runs-on: ubuntu-latest
 
     steps:
