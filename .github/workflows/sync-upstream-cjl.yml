@@ -22,7 +22,7 @@ jobs:
 
       - name: Add upstream remote
         run: |
-          git remote add upstream https://github.com/RSSHub-dev/RSSHub.git
+          git remote add upstream https://github.com/DIYgod/RSSHub.git
           git fetch upstream
 
       - name: Merge upstream into fork
