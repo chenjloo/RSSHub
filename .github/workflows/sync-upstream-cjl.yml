@@ -1,4 +1,4 @@
-name: Sync RSSHub upstream → master
+name: Sync RSSHub upstream -> master
 
 on:
   schedule:
