@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'This workflow only runs on master branch'
+        description: 'This workflow only runs on master branch. Enter "yes" to confirm.'
         required: false
 
 jobs:
   sync:
     # Safety check: only allow this job to run on master branch
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' && (github.event_name != 'workflow_dispatch' || github.event.inputs.confirm == 'yes')
 
     runs-on: ubuntu-latest
     permissions:
@@ -33,24 +33,28 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      # Add official RSSHub upstream repository and fetch updates
+      # Add official RSSHub upstream repository if not exists
       - name: Add upstream and fetch
         run: |
-          git remote add upstream https://github.com/DIYgod/RSSHub.git
+          git remote | grep upstream || git remote add upstream https://github.com/DIYgod/RSSHub.git
           git fetch upstream
 
       # Try to merge upstream/master into local master
       - name: Merge upstream into master
         id: merge
         run: |
-          git merge upstream/master --no-ff --no-edit
+          git merge upstream/master --no-ff --no-edit || exit 1
         continue-on-error: true
 
-      # Push changes only if merge succeeds without conflicts
+      # Push changes only if merge succeeds and there are actual changes
       - name: Push if merge succeeded
         if: steps.merge.outcome == 'success'
         run: |
-          git push origin master
+          if [ -n "$(git status --porcelain)" ]; then
+            git push origin master
+          else
+            echo "No changes to push."
+          fi
 
       # Create an issue if merge fails due to conflicts
       - name: Create issue on conflict
@@ -64,8 +68,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: '🚨 Upstream sync conflict on master',
-              body: `
-### ❌ Upstream sync failed (Conflict detected)
+              body: `### ❌ Upstream sync failed (Conflict detected)
 
 Merging upstream RSSHub changes into **master** branch resulted in **merge conflicts**.
 This sync process has been **automatically stopped**.
@@ -87,6 +90,5 @@ Please resolve the conflicts manually before the next sync.
 - 当前分支：\`master\`
 - Actions 日志：${runUrl}
 
-请人工处理冲突（解决 / revert / 忽略相关提交）后再继续同步。
-`
+请人工处理冲突（解决 / revert / 忽略相关提交）后再继续同步。`
             });
