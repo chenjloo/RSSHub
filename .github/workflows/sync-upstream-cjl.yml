@@ -2,19 +2,19 @@ name: Sync Upstream RSSHub
 
 on:
   schedule:
-    - cron: '0 3 * * *'   # 每天 UTC 03:00（北京时间 11:00）
-  workflow_dispatch:      # 允许手动触发
+    - cron: '0 3 * * *'
+  workflow_dispatch:
 
 jobs:
   sync:
-    if: github.ref == 'refs/heads/master'  # ← 只有 master 才执行
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout fork
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # 必须完整历史，否则不能 merge
+          fetch-depth: 0
 
       - name: Configure git
         run: |
