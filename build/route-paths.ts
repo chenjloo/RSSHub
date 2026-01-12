@@ -1417,7 +1417,6 @@ export type RoutePath =
   | `/hust/yjs`
   | `/huxiu/article`
   | `/huxiu/author/:id/:type?`
-  | `/huxiu/briefcolumn/:id`
   | `/huxiu/channel/:id?`
   | `/huxiu/club/:id`
   | `/huxiu/collection/:id`
@@ -1781,6 +1780,7 @@ export type RoutePath =
   | `/matters/author/:uid`
   | `/matters/latest/:type?`
   | `/matters/tags/:tid`
+  | `/maven/central/:group/:artifact`
   | `/mckinsey/cn/:category?`
   | `/mcmod/:type`
   | `/mdpi/:journal`
@@ -2047,6 +2047,7 @@ export type RoutePath =
   | `/nyaa/sukebei/user/:username?`
   | `/nyaa/user/:username/search/:query?`
   | `/nyaa/user/:username?`
+  | `/nyc/mayors-office-news/:types?/:categories?`
   | `/nycu/aa/:id?`
   | `/nycu/announcement/:type`
   | `/nycu/cs/:category?`
