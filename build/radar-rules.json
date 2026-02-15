@@ -7134,6 +7134,35 @@
       }
     ]
   },
+  "bbc.com": {
+    "_name": "BBC",
+    "www": [
+      {
+        "title": "Sport",
+        "docs": "https://docs.rsshub.app/routes/traditional-media",
+        "source": [
+          "/sport/:sport"
+        ],
+        "target": "/bbc/sport/:sport"
+      },
+      {
+        "title": "Topics - BBC News 中文",
+        "docs": "https://docs.rsshub.app/routes/traditional-media",
+        "source": [
+          "/zhongwen/topics/:topic/:variant"
+        ],
+        "target": "/bbc/zhongwen/topics/:topic/:variant?"
+      },
+      {
+        "title": "Topics",
+        "docs": "https://docs.rsshub.app/routes/traditional-media",
+        "source": [
+          "/news/topics/:topic"
+        ],
+        "target": "/bbc/topics/:topic"
+      }
+    ]
+  },
   "bbcnewslabs.co.uk": {
     "_name": "BBC News Labs",
     ".": [
@@ -9986,6 +10015,75 @@
           "/mtbd"
         ],
         "target": "/ccg/mtbd"
+      }
+    ]
+  },
+  "ccmn.cn": {
+    "_name": "长江有色网",
+    "copper": [
+      {
+        "title": "调价动态",
+        "docs": "https://docs.rsshub.app/routes/other",
+        "source": [
+          "/:suffix",
+          "/:suffix/:subsuffix"
+        ],
+        "target": "/ccmn/price-adjustment/copper"
+      }
+    ],
+    "alu": [
+      {
+        "title": "调价动态",
+        "docs": "https://docs.rsshub.app/routes/other",
+        "source": [
+          "/:suffix",
+          "/:suffix/:subsuffix"
+        ],
+        "target": "/ccmn/price-adjustment/alu"
+      }
+    ],
+    "zn": [
+      {
+        "title": "调价动态",
+        "docs": "https://docs.rsshub.app/routes/other",
+        "source": [
+          "/:suffix",
+          "/:suffix/:subsuffix"
+        ],
+        "target": "/ccmn/price-adjustment/zn"
+      }
+    ],
+    "sn": [
+      {
+        "title": "调价动态",
+        "docs": "https://docs.rsshub.app/routes/other",
+        "source": [
+          "/:suffix",
+          "/:suffix/:subsuffix"
+        ],
+        "target": "/ccmn/price-adjustment/sn"
+      }
+    ],
+    "pb": [
+      {
+        "title": "调价动态",
+        "docs": "https://docs.rsshub.app/routes/other",
+        "source": [
+          "/:suffix",
+          "/:suffix/:subsuffix"
+        ],
+        "target": "/ccmn/price-adjustment/pb"
+      }
+    ],
+    "ni": [
+      {
+        "title": "调价动态",
+        "docs": "https://docs.rsshub.app/routes/other",
+        "source": [
+          "/:suffix",
+          "/:suffix/:subsuffix"
+        ],
+        "target": "/ccmn/price-adjustment/ni"
       }
     ]
   },
@@ -16024,6 +16122,20 @@
       }
     ]
   },
+  "elamigos.site": {
+    "_name": "ElAmigos",
+    ".": [
+      {
+        "title": "Releases",
+        "docs": "https://docs.rsshub.app/routes/game",
+        "source": [
+          "/",
+          "/index.html"
+        ],
+        "target": "/elamigos/games"
+      }
+    ]
+  },
   "elasticsearch.cn": {
     "_name": "Elastic 中文社区",
     ".": [
@@ -16441,6 +16553,19 @@
           "/en/packages/:app/"
         ],
         "target": "/f-droid/apprelease/:app"
+      }
+    ]
+  },
+  "f95zone.to": {
+    "_name": "F95zone",
+    ".": [
+      {
+        "title": "Thread",
+        "docs": "https://docs.rsshub.app/routes/game",
+        "source": [
+          "/threads/:thread/*"
+        ],
+        "target": "/f95zone/thread/:thread"
       }
     ]
   },
@@ -18388,6 +18513,29 @@
           "/:owner/:gistId"
         ],
         "target": "/github/gist/:gistId"
+      }
+    ]
+  },
+  "gitkraken.com": {
+    "_name": "GitKraken",
+    "help": [
+      {
+        "title": "Release Notes",
+        "docs": "https://docs.rsshub.app/routes/program-update",
+        "source": [
+          "/gitkraken-desktop/current/"
+        ],
+        "target": "/gitkraken/release-note"
+      }
+    ],
+    "www": [
+      {
+        "title": "Release Notes",
+        "docs": "https://docs.rsshub.app/routes/program-update",
+        "source": [
+          "/"
+        ],
+        "target": "/gitkraken/release-note"
       }
     ]
   },
@@ -20888,12 +21036,12 @@
     "_name": "深圳市罗湖区人民政府",
     ".": [
       {
-        "title": "发展规划司",
+        "title": "司工作进展",
         "docs": "https://docs.rsshub.app/routes/government",
         "source": [
-          "/sjzz/ghs/"
+          "/sjzz/:bureau/index.htm"
         ],
-        "target": "/gov/nea/sjzz/ghs"
+        "target": "/gov/nea/sjzz/:bureau"
       }
     ]
   },
@@ -31990,6 +32138,24 @@
         ],
         "target": "/mit/hanlab/blog"
       }
+    ],
+    "scratch": [
+      {
+        "title": "Scratch User Comments",
+        "docs": "https://docs.rsshub.app/routes/social-media",
+        "source": [
+          "/users/:username/"
+        ],
+        "target": "/mit/scratch/user-comments/:username"
+      },
+      {
+        "title": "Scratch User Projects",
+        "docs": "https://docs.rsshub.app/routes/social-media",
+        "source": [
+          "/users/:username/projects/"
+        ],
+        "target": "/mit/scratch/user-projects/:username"
+      }
     ]
   },
   "miui.com": {
@@ -34912,9 +35078,9 @@
         "title": "南信大信息公告栏",
         "docs": "https://docs.rsshub.app/routes/university",
         "source": [
-          "/:category/list.htm"
+          "/:filename"
         ],
-        "target": "/nuist/bulletin/:category"
+        "target": "/nuistparams=>{const filename=params.filename.replace(/\\.htm$/i,\"\");return`/nuist${filename===\"index\"?\"/bulletin\":`/bulletin/${filename}`}`}"
       }
     ],
     "lib": [
@@ -35204,6 +35370,19 @@
       }
     ]
   },
+  "openalex.org": {
+    "_name": "OpenAlex",
+    ".": [
+      {
+        "title": "Works",
+        "docs": "https://docs.rsshub.app/routes/journal",
+        "source": [
+          "/works"
+        ],
+        "target": "/openalex/:journals/:type?/:ids?"
+      }
+    ]
+  },
   "openwrt.org": {
     "_name": "OpenWrt",
     ".": [
@@ -35271,9 +35450,9 @@
         "title": "资讯",
         "docs": "https://docs.rsshub.app/routes/programming",
         "source": [
-          "/news/:category"
+          "/"
         ],
-        "target": "/oschina/news/:category"
+        "target": "/oschina/news"
       },
       {
         "title": "问答主题",
@@ -35286,20 +35465,13 @@
     ],
     "my": [
       {
-        "title": "数字型账号用户博客",
+        "title": "用户博客",
         "docs": "https://docs.rsshub.app/routes/programming",
         "source": [
-          "/u/:uid"
+          "/u/:uid",
+          "/:uid"
         ],
         "target": "/oschina/u/:uid"
-      },
-      {
-        "title": "数字型账号用户博客",
-        "docs": "https://docs.rsshub.app/routes/programming",
-        "source": [
-          "/u/:uid"
-        ],
-        "target": "/oschina/user/:id"
       }
     ]
   },
@@ -39424,6 +39596,19 @@
       }
     ]
   },
+  "quantamagazine.org": {
+    "_name": "Quanta Magazine",
+    ".": [
+      {
+        "title": "Archive",
+        "docs": "https://docs.rsshub.app/routes/new-media",
+        "source": [
+          "/"
+        ],
+        "target": "/quantamagazine/archive"
+      }
+    ]
+  },
   "questn.com": {
     "_name": "QuestN",
     "app": [
@@ -41508,6 +41693,15 @@
         "target": "/sina/finance/china"
       },
       {
+        "title": "财经－滚动新闻",
+        "docs": "https://docs.rsshub.app/routes/new-media",
+        "source": [
+          "/roll",
+          "/"
+        ],
+        "target": "/sina/finance/rollnews"
+      },
+      {
         "title": "美股",
         "docs": "https://docs.rsshub.app/routes/new-media",
         "source": [
@@ -41935,6 +42129,55 @@
           "/p/:id"
         ],
         "target": "/smzdm/product/:id"
+      }
+    ]
+  },
+  "snnu.edu.cn": {
+    "_name": "Shaanxi Normal University",
+    "ccs": [
+      {
+        "title": "计算机科学学院",
+        "docs": "https://docs.rsshub.app/routes/university",
+        "source": [
+          "/tzgg/zhgl1.htm"
+        ],
+        "target": "/snnu/ccs/tzgg"
+      },
+      {
+        "title": "计算机科学学院",
+        "docs": "https://docs.rsshub.app/routes/university",
+        "source": [
+          "/xydt/zhxw1.htm"
+        ],
+        "target": "/snnu/ccs/news"
+      },
+      {
+        "title": "计算机科学学院",
+        "docs": "https://docs.rsshub.app/routes/university",
+        "source": [
+          "/xssq/xshd.htm"
+        ],
+        "target": "/snnu/ccs/xshd"
+      }
+    ],
+    "www": [
+      {
+        "title": "学校官网 - 通知公告",
+        "docs": "https://docs.rsshub.app/routes/university",
+        "source": [
+          "/tzgg.htm"
+        ],
+        "target": "/snnu/"
+      }
+    ],
+    "newyjs": [
+      {
+        "title": "研究生院通知公告",
+        "docs": "https://docs.rsshub.app/routes/university",
+        "source": [
+          "/tzgg1.htm"
+        ],
+        "target": "/snnu/yjs"
       }
     ]
   },
@@ -44428,6 +44671,19 @@
       }
     ]
   },
+  "tctmd.com": {
+    "_name": "TCTMD",
+    "www": [
+      {
+        "title": "Conference News",
+        "docs": "https://docs.rsshub.app/routes/journal",
+        "source": [
+          "/news/conference-news"
+        ],
+        "target": "/tctmd/conference-news"
+      }
+    ]
+  },
   "techcrunch.com": {
     "_name": "TechCrunch",
     ".": [
@@ -45052,7 +45308,15 @@
   },
   "tiktok.com": {
     "_name": "TikTok",
-    ".": [
+    "www": [
+      {
+        "title": "Live",
+        "docs": "https://docs.rsshub.app/routes/social-media",
+        "source": [
+          "/:user/live"
+        ],
+        "target": "/tiktok/live/:user"
+      },
       {
         "title": "User",
         "docs": "https://docs.rsshub.app/routes/social-media",
