@@ -5,11 +5,41 @@ import cache from '@/utils/cache';
 import got from '@/utils/got';
 import parser from '@/utils/rss-parser';
 
+// Channel ID map from https://www.cnbc.com/rss-feeds/
+const CHANNEL_MAP: Record<string, string> = {
+    'top-news': '100003114',
+    'world-news': '100004095',
+    business: '10000664',
+    finance: '10001147',
+    earnings: '15839135',
+    investing: '15839069',
+    tech: '19854910',
+    politics: '10000113',
+    entertainment: '10001397',
+    health: '10000108',
+    'real-estate': '21324812',
+    energy: '19836768',
+    media: '10000115',
+    cybersecurity: '26094818',
+    science: '15956632',
+    sports: '10000116',
+    'personal-finance': '21324812',
+    travel: '10001781',
+    climate: '44877279',
+    retail: '10000116',
+};
+
 export const route: Route = {
     path: '/rss/:id?',
     categories: ['traditional-media'],
-    example: '/cnbc/rss',
-    parameters: { id: 'Channel ID, can be found in Official RSS URL, `100003114` (Top News) by default' },
+    example: '/cnbc/rss/top-news',
+    parameters: {
+        id: `Channel ID or channel name. Defaults to \`top-news\`. 
+        
+Supported names: ${Object.keys(CHANNEL_MAP).join(', ')}.
+
+Or use numeric IDs from [CNBC RSS feeds](https://www.cnbc.com/rss-feeds/).`,
+    },
     features: {
         requireConfig: false,
         requirePuppeteer: false,
@@ -29,12 +59,34 @@ export const route: Route = {
     handler,
     description: `Provides a better reading experience (full articles) over the official ones.
 
-  Support all channels, refer to [CNBC RSS feeds](https://www.cnbc.com/rss-feeds/).`,
+Supports all channels via numeric ID or named slug. See [CNBC RSS feeds](https://www.cnbc.com/rss-feeds/).
+
+| Channel Name | Slug |
+|---|---|
+| Top News | \`top-news\` |
+| World News | \`world-news\` |
+| Business | \`business\` |
+| Finance | \`finance\` |
+| Earnings | \`earnings\` |
+| Investing | \`investing\` |
+| Technology | \`tech\` |
+| Politics | \`politics\` |
+| Entertainment | \`entertainment\` |
+| Health | \`health\` |
+| Real Estate | \`real-estate\` |
+| Energy | \`energy\` |
+| Media | \`media\` |
+| Cybersecurity | \`cybersecurity\` |
+| Science | \`science\` |`,
 };
 
 async function handler(ctx) {
-    const { id = '100003114' } = ctx.req.param();
-    const feed = await parser.parseURL(`https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=${id}`);
+    const { id = 'top-news' } = ctx.req.param();
+    
+    // Resolve named slug to numeric ID, or use as-is if already numeric
+    const channelId = CHANNEL_MAP[id] ?? id;
+    
+    const feed = await parser.parseURL(`https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=${channelId}`);
 
     const items = await Promise.all(
         feed.items
