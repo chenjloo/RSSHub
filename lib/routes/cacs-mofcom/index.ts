@@ -1,84 +1,75 @@
 import { type CheerioAPI, load } from 'cheerio';
 import type { Route, DataItem } from '@/types';
-import ofetch from '@/utils/ofetch';
+import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
 
 // ─── 栏目配置表 ──────────────────────────────────────────────
 const CATEGORIES: Record<string, { name: string; section: string; slug: string }> = {
-    // 案件与措施
-    jkdc:  { name: '进口调查',      section: 'ajycs',    slug: 'jkdc'  },
-    ckyy:  { name: '出口应诉',      section: 'ajycs',    slug: 'ckyy'  },
-    myhz:  { name: '贸易伙伴间案件', section: 'ajycs',    slug: 'myhz'  },
-    smzd:  { name: '世贸争端',      section: 'ajycs',    slug: 'smzd'  },
-    '337dc': { name: '337调查',     section: 'ajycs',    slug: '337dc' },
-    hhtb:  { name: '召回通报',      section: 'ajycs',    slug: 'hhtb'  },
-    // 境内外经贸动态
-    jn: { name: '境内动态', section: 'jnwjmdt', slug: 'jn' },
-    jw: { name: '境外动态', section: 'jnwjmdt', slug: 'jw' },
-    df: { name: '地方动态', section: 'jnwjmdt', slug: 'df' },
-    // 资讯集锦
-    gzyw: { name: '工作要闻', section: 'zxjj', slug: 'gzyw' },
-    zjgd: { name: '专家观点', section: 'zxjj', slug: 'zjgd' },
-    ald:  { name: '案例导读', section: 'zxjj', slug: 'ald'  },
-    // 政策法律
-    myjy: { name: '贸易救济政策', section: 'zcfl', slug: 'myjy' },
-    xgzc: { name: '相关政策',    section: 'zcfl', slug: 'xgzc' },
+    jkdc:    { name: '进口调查',       section: 'ajycs',    slug: 'jkdc'   },
+    ckyy:    { name: '出口应诉',       section: 'ajycs',    slug: 'ckyy'   },
+    myhz:    { name: '贸易伙伴间案件',  section: 'ajycs',    slug: 'myhz'   },
+    smzd:    { name: '世贸争端',       section: 'ajycs',    slug: 'smzd'   },
+    '337dc': { name: '337调查',        section: 'ajycs',    slug: '337dc'  },
+    hhtb:    { name: '召回通报',       section: 'ajycs',    slug: 'hhtb'   },
+    jn:      { name: '境内动态',       section: 'jnwjmdt',  slug: 'jn'     },
+    jw:      { name: '境外动态',       section: 'jnwjmdt',  slug: 'jw'     },
+    df:      { name: '地方动态',       section: 'jnwjmdt',  slug: 'df'     },
+    gzyw:    { name: '工作要闻',       section: 'zxjj',     slug: 'gzyw'   },
+    zjgd:    { name: '专家观点',       section: 'zxjj',     slug: 'zjgd'   },
+    ald:     { name: '案例导读',       section: 'zxjj',     slug: 'ald'    },
+    myjy:    { name: '贸易救济政策',   section: 'zcfl',     slug: 'myjy'   },
+    xgzc:    { name: '相关政策',       section: 'zcfl',     slug: 'xgzc'   },
 };
 
 const BASE_URL = 'https://cacs.mofcom.gov.cn';
 
-const HEADERS = {
+const REQ_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
     'Upgrade-Insecure-Requests': '1',
-    'Sec-Fetch-Dest': 'document',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'same-origin',
-    'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-    'Sec-Ch-Ua-Mobile': '?0',
-    'Sec-Ch-Ua-Platform': '"Windows"',
 };
 
-// ─── 绕过绿盟 WAF insert_cookie 验证 ─────────────────────────
-// 机制：第1次请求 → 服务器下发 insert_cookie=xxxxx（返回空/假内容）
-//       第2次带上该 Cookie 请求 → 才返回真实内容
-async function fetchWithCookie(url: string): Promise<string> {
-    // 第1次请求，目的只是拿 set-cookie
-    const firstResp = await ofetch.raw(url, {
-        headers: { ...HEADERS, Referer: `${BASE_URL}/` },
-        redirect: 'follow',
-        // 不 throw on error，让我们自己处理
-        onResponseError: () => {},
+// ─── 绕过绿盟 WAF insert_cookie ───────────────────────────────
+// 第1次请求目标 URL → 服务器下发 insert_cookie=xxxxx
+// 第2次带上 Cookie 请求 → 返回真实内容
+async function fetchPage(url: string): Promise<string> {
+    // 第1次：拿 Cookie（got 不自动跟随 cookie）
+    const first = await got(url, {
+        headers: { ...REQ_HEADERS, Referer: `${BASE_URL}/` },
+        followRedirect: true,
+        throwHttpErrors: false,
     });
 
-    const rawSetCookie = firstResp.headers.get('set-cookie') ?? '';
-    // set-cookie 格式: "insert_cookie=67355429; path=/"
-    const cookies = rawSetCookie
-        .split(/,(?=\s*\w+=)/g)
-        .map((c: string) => c.trim().split(';')[0].trim())
+    // 提取 set-cookie 里的所有 key=value
+    const setCookies: string[] = first.headers['set-cookie'] ?? [];
+    const cookieStr = setCookies
+        .map((c) => c.split(';')[0].trim())
         .filter(Boolean)
         .join('; ');
 
-    // 第2次请求带上 Cookie，拿真实内容
-    return await ofetch(url, {
+    // 第2次：带 Cookie 重新请求
+    const second = await got(url, {
         headers: {
-            ...HEADERS,
+            ...REQ_HEADERS,
             Referer: `${BASE_URL}/`,
-            Cookie: cookies,
+            Cookie: cookieStr,
         },
+        followRedirect: true,
     });
+
+    return second.body;
 }
 
 // ─── 抓取列表页 ──────────────────────────────────────────────
 async function fetchList(section: string, slug: string, page = 1): Promise<DataItem[]> {
     const url = `${BASE_URL}/list/${section}/${slug}/${page}/cateinfo.html`;
-    const html = await fetchWithCookie(url);
+    const html = await fetchPage(url);
 
     const $: CheerioAPI = load(html);
     const items: DataItem[] = [];
 
-    // 实际结构：<ul class="list02 mt15" id="infoList">
+    // <ul class="list02 mt15" id="infoList">
     //   <li><a href="/article/...">标题</a><span>2026-03-13</span></li>
     $('#infoList li').each((_, el) => {
         const $el = $(el);
@@ -89,7 +80,6 @@ async function fetchList(section: string, slug: string, page = 1): Promise<DataI
             link = `${BASE_URL}${link}`;
         }
         const dateStr = $el.find('span').first().text().trim();
-
         if (title && link) {
             items.push({
                 title,
@@ -111,16 +101,15 @@ interface ArticleDetail {
 
 async function fetchContent(link: string): Promise<ArticleDetail> {
     try {
-        const html = await fetchWithCookie(link);
+        const html = await fetchPage(link);
         const $ = load(html);
 
-        // <h2 class="title02" id="show_time">2026-03-13 16:51:29 商务部贸易救济调查局</h2>
+        // <h2 id="show_time">2026-03-13 16:51:29 商务部贸易救济调查局</h2>
         const timeText = $('#show_time').text().trim();
         const timeParts = timeText.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*(.*)/);
         const pubDate = timeParts ? parseDate(timeParts[1]) : undefined;
         const author = timeParts?.[2]?.trim() || undefined;
 
-        // 正文容器：<section class="article">，移除免责声明
         const $article = $('section.article');
         $article.find('.lawShow, #show_title, #show_time, h3').remove();
         const description = $article.html() ?? '';
@@ -146,12 +135,7 @@ async function handler(ctx: any) {
         items.slice(0, 10).map(async (item) => {
             if (!item.link) return item;
             const { description, pubDate, author } = await fetchContent(item.link);
-            return {
-                ...item,
-                description,
-                pubDate: pubDate ?? item.pubDate,
-                author,
-            };
+            return { ...item, description, pubDate: pubDate ?? item.pubDate, author };
         })
     );
 
