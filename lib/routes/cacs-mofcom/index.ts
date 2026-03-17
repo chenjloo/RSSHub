@@ -22,15 +22,15 @@ const CATEGORIES: Record<string, { name: string; section: string; slug: string }
 
 const BASE_URL = 'https://cacs.mofcom.gov.cn';
 
-// curl 测试证明不需要 Cookie，直接请求即可
+// RSSHub 的 got 封装返回 { data }，不是 { body }
 async function fetchPage(url: string): Promise<string> {
-    const resp = await got(url, {
+    const { data } = await got(url, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             Referer: BASE_URL + '/',
         },
     });
-    return resp.body;
+    return data;
 }
 
 async function fetchList(section: string, slug: string, page = 1): Promise<DataItem[]> {
@@ -39,6 +39,7 @@ async function fetchList(section: string, slug: string, page = 1): Promise<DataI
     const $: CheerioAPI = load(html);
     const items: DataItem[] = [];
 
+    // <ul id="infoList"><li><a href="/article/...">标题</a><span>2026-03-13</span></li>
     $('#infoList li').each((_, el) => {
         const $el = $(el);
         const $a = $el.find('a').first();
