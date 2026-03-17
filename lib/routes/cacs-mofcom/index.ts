@@ -4,19 +4,14 @@ import ofetch from '@/utils/ofetch';
 import { parseDate } from '@/utils/parse-date';
 
 // ─── 栏目配置表 ──────────────────────────────────────────────
-// URL 规律: https://cacs.mofcom.gov.cn/list/{section}/{slug}/{page}/cateinfo.html
-// 其中首页汇总列表用 /cacscms/view/notice/{slug}
-const CATEGORIES: Record<
-    string,
-    { name: string; section: string; slug: string }
-> = {
+const CATEGORIES: Record<string, { name: string; section: string; slug: string }> = {
     // 案件与措施
-    jkdc: { name: '进口调查', section: 'ajycs', slug: 'jkdc' },
-    ckyy: { name: '出口应诉', section: 'ajycs', slug: 'ckyy' },
-    myhz: { name: '贸易伙伴间案件', section: 'ajycs', slug: 'myhz' },
-    smzd: { name: '世贸争端', section: 'ajycs', slug: 'smzd' },
-    '337dc': { name: '337调查', section: 'ajycs', slug: '337dc' },
-    hhtb: { name: '召回通报', section: 'ajycs', slug: 'hhtb' },
+    jkdc:  { name: '进口调查',      section: 'ajycs',    slug: 'jkdc'  },
+    ckyy:  { name: '出口应诉',      section: 'ajycs',    slug: 'ckyy'  },
+    myhz:  { name: '贸易伙伴间案件', section: 'ajycs',    slug: 'myhz'  },
+    smzd:  { name: '世贸争端',      section: 'ajycs',    slug: 'smzd'  },
+    '337dc': { name: '337调查',     section: 'ajycs',    slug: '337dc' },
+    hhtb:  { name: '召回通报',      section: 'ajycs',    slug: 'hhtb'  },
     // 境内外经贸动态
     jn: { name: '境内动态', section: 'jnwjmdt', slug: 'jn' },
     jw: { name: '境外动态', section: 'jnwjmdt', slug: 'jw' },
@@ -24,20 +19,18 @@ const CATEGORIES: Record<
     // 资讯集锦
     gzyw: { name: '工作要闻', section: 'zxjj', slug: 'gzyw' },
     zjgd: { name: '专家观点', section: 'zxjj', slug: 'zjgd' },
-    ald: { name: '案例导读', section: 'zxjj', slug: 'ald' },
+    ald:  { name: '案例导读', section: 'zxjj', slug: 'ald'  },
     // 政策法律
     myjy: { name: '贸易救济政策', section: 'zcfl', slug: 'myjy' },
-    xgzc: { name: '相关政策', section: 'zcfl', slug: 'xgzc' },
+    xgzc: { name: '相关政策',    section: 'zcfl', slug: 'xgzc' },
 };
 
 const BASE_URL = 'https://cacs.mofcom.gov.cn';
 
-// 模拟完整浏览器请求头
 const HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, br',
     'Upgrade-Insecure-Requests': '1',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -47,24 +40,32 @@ const HEADERS = {
     'Sec-Ch-Ua-Platform': '"Windows"',
 };
 
-// 先访问首页拿到初始 Cookie，再请求目标页（绕过 WAF 首次访问验证）
+// ─── 绕过绿盟 WAF insert_cookie 验证 ─────────────────────────
+// 机制：第1次请求 → 服务器下发 insert_cookie=xxxxx（返回空/假内容）
+//       第2次带上该 Cookie 请求 → 才返回真实内容
 async function fetchWithCookie(url: string): Promise<string> {
-    const initResp = await ofetch.raw(BASE_URL, {
-        headers: { ...HEADERS, Referer: 'https://www.mofcom.gov.cn/' },
+    // 第1次请求，目的只是拿 set-cookie
+    const firstResp = await ofetch.raw(url, {
+        headers: { ...HEADERS, Referer: `${BASE_URL}/` },
         redirect: 'follow',
+        // 不 throw on error，让我们自己处理
+        onResponseError: () => {},
     });
-    const setCookieHeader = initResp.headers.get('set-cookie') ?? '';
-    const cookies = setCookieHeader
-        .split(',')
-        .map((c: string) => c.trim().split(';')[0])
+
+    const rawSetCookie = firstResp.headers.get('set-cookie') ?? '';
+    // set-cookie 格式: "insert_cookie=67355429; path=/"
+    const cookies = rawSetCookie
+        .split(/,(?=\s*\w+=)/g)
+        .map((c: string) => c.trim().split(';')[0].trim())
         .filter(Boolean)
         .join('; ');
 
+    // 第2次请求带上 Cookie，拿真实内容
     return await ofetch(url, {
         headers: {
             ...HEADERS,
             Referer: `${BASE_URL}/`,
-            ...(cookies ? { Cookie: cookies } : {}),
+            Cookie: cookies,
         },
     });
 }
@@ -113,19 +114,13 @@ async function fetchContent(link: string): Promise<ArticleDetail> {
         const html = await fetchWithCookie(link);
         const $ = load(html);
 
-        // 实际结构：<section class="article">
-        //   <h1 class="title01" id="show_title">标题</h1>
-        //   <h2 class="title02" id="show_time">2026-03-13 16:51:29 商务部贸易救济调查局</h2>
-        //   <p>正文...</p>
-        //   <div class="lawShow">免责声明</div>
-
-        // 提取精确发布时间和来源
-        const timeText = $('#show_time').text().trim(); // "2026-03-13 16:51:29 商务部贸易救济调查局"
+        // <h2 class="title02" id="show_time">2026-03-13 16:51:29 商务部贸易救济调查局</h2>
+        const timeText = $('#show_time').text().trim();
         const timeParts = timeText.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*(.*)/);
         const pubDate = timeParts ? parseDate(timeParts[1]) : undefined;
         const author = timeParts?.[2]?.trim() || undefined;
 
-        // 移除免责声明，保留正文
+        // 正文容器：<section class="article">，移除免责声明
         const $article = $('section.article');
         $article.find('.lawShow, #show_title, #show_time, h3').remove();
         const description = $article.html() ?? '';
@@ -142,24 +137,18 @@ async function handler(ctx: any) {
     const meta = CATEGORIES[category];
 
     if (!meta) {
-        throw new Error(
-            `未知栏目 "${category}"，可用值：${Object.keys(CATEGORIES).join(', ')}`
-        );
+        throw new Error(`未知栏目 "${category}"，可用值：${Object.keys(CATEGORIES).join(', ')}`);
     }
 
     const items = await fetchList(meta.section, meta.slug);
 
-    // 并发抓取全文（最多 5 条，避免给服务器施压）
     const enriched = await Promise.all(
         items.slice(0, 10).map(async (item) => {
-            if (!item.link) {
-                return item;
-            }
+            if (!item.link) return item;
             const { description, pubDate, author } = await fetchContent(item.link);
             return {
                 ...item,
                 description,
-                // 详情页时间更精确（含时分秒），优先使用
                 pubDate: pubDate ?? item.pubDate,
                 author,
             };
@@ -180,7 +169,7 @@ export const route: Route = {
     path: '/:category?',
     name: '中国贸易救济信息网',
     url: 'cacs.mofcom.gov.cn',
-    maintainers: [],        // 填写你的 GitHub handle
+    maintainers: [],
     example: '/cacs-mofcom/jkdc',
     parameters: {
         category: {
@@ -197,10 +186,7 @@ export const route: Route = {
         {
             source: ['cacs.mofcom.gov.cn/list/:section/:slug/*'],
             target: (params) => {
-                // 反查 slug → category
-                const found = Object.entries(CATEGORIES).find(
-                    ([, v]) => v.slug === params.slug
-                );
+                const found = Object.entries(CATEGORIES).find(([, v]) => v.slug === params.slug);
                 return found ? `/${found[0]}` : '/jkdc';
             },
         },
