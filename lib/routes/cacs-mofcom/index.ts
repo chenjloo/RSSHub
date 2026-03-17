@@ -32,16 +32,47 @@ const CATEGORIES: Record<
 
 const BASE_URL = 'https://cacs.mofcom.gov.cn';
 
+// 模拟完整浏览器请求头
+const HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    'Sec-Ch-Ua-Mobile': '?0',
+    'Sec-Ch-Ua-Platform': '"Windows"',
+};
+
+// 先访问首页拿到初始 Cookie，再请求目标页（绕过 WAF 首次访问验证）
+async function fetchWithCookie(url: string): Promise<string> {
+    const initResp = await ofetch.raw(BASE_URL, {
+        headers: { ...HEADERS, Referer: 'https://www.mofcom.gov.cn/' },
+        redirect: 'follow',
+    });
+    const setCookieHeader = initResp.headers.get('set-cookie') ?? '';
+    const cookies = setCookieHeader
+        .split(',')
+        .map((c: string) => c.trim().split(';')[0])
+        .filter(Boolean)
+        .join('; ');
+
+    return await ofetch(url, {
+        headers: {
+            ...HEADERS,
+            Referer: `${BASE_URL}/`,
+            ...(cookies ? { Cookie: cookies } : {}),
+        },
+    });
+}
+
 // ─── 抓取列表页 ──────────────────────────────────────────────
 async function fetchList(section: string, slug: string, page = 1): Promise<DataItem[]> {
     const url = `${BASE_URL}/list/${section}/${slug}/${page}/cateinfo.html`;
-    const html = await ofetch(url, {
-        headers: {
-            'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            Referer: BASE_URL,
-        },
-    });
+    const html = await fetchWithCookie(url);
 
     const $: CheerioAPI = load(html);
     const items: DataItem[] = [];
@@ -79,13 +110,7 @@ interface ArticleDetail {
 
 async function fetchContent(link: string): Promise<ArticleDetail> {
     try {
-        const html = await ofetch(link, {
-            headers: {
-                'User-Agent':
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                Referer: BASE_URL,
-            },
-        });
+        const html = await fetchWithCookie(link);
         const $ = load(html);
 
         // 实际结构：<section class="article">
